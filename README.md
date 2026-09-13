@@ -6,7 +6,7 @@ ChainSignal is a local-first decision-support platform for manufacturer/importer
 
 ## Phase 0 status
 
-This repository currently contains only the **Product Definition & Architecture Contract** skeleton. Business logic is intentionally deferred.
+This repository currently contains the **Product Definition & Architecture Contract** and a Docker-first local runtime skeleton. Business logic is intentionally deferred.
 
 ### V1 tracked assets
 
@@ -30,6 +30,27 @@ This repository currently contains only the **Product Definition & Architecture 
 - **Go** — Phase 6 only, for historical replay / Kafka stream simulation if the batch core is stable.
 - **Kafka** — intentionally deferred until the batch-first core product is stable.
 
+## Docker-first local runtime
+
+ChainSignal uses Docker Compose as the single integrated local runtime entrypoint.
+
+As later phases initialize the application subprojects, their containers will be added to the same Compose project:
+
+```text
+docker compose up -d --build
+          |
+          +-- PostgreSQL/PostGIS
+          +-- Spring Boot backend        (later phase)
+          +-- Python data pipeline       (later phase)
+          +-- Next.js frontend           (later phase)
+          +-- Go replay service          (Phase 6 gate)
+          +-- Kafka                      (Phase 6 gate/profile)
+```
+
+For the normal integrated local workflow, developers should not need to manually start every application runtime one by one.
+
+Kafka and the Go replay service remain gated by the batch-first architecture decision.
+
 ## Toolchain baseline
 
 The Phase 0 baseline is:
@@ -48,11 +69,12 @@ Exact application dependency versions will be locked when each subproject is ini
 
 ```text
 chain-signal/
+├── compose.yml               # Single local Docker Compose entrypoint
 ├── backend/                  # Spring Boot risk/control plane (later phase)
 ├── data-pipeline/            # Python ingestion/data/ML pipeline (later phase)
 ├── frontend/                 # Next.js dashboard (later phase)
 ├── replay-service/           # Go replay service (Phase 6 gate)
-├── infra/                    # Local infrastructure
+├── infra/                    # Local infrastructure details
 ├── docs/                     # Product/domain/architecture docs
 │   ├── adr/
 │   └── diagrams/
@@ -61,42 +83,42 @@ chain-signal/
 └── README.md
 ```
 
-## Local database bootstrap
+## Local bootstrap
 
 From the repository root:
 
 ```powershell
 Copy-Item .env.example .env
-docker compose --env-file .env -f infra/docker-compose.yml up -d
-docker compose --env-file .env -f infra/docker-compose.yml ps
+docker compose up -d --build
+docker compose ps
 ```
 
 Verify PostgreSQL readiness:
 
 ```powershell
-docker compose --env-file .env -f infra/docker-compose.yml exec postgres pg_isready -U chainsignal -d chainsignal
+docker compose exec postgres pg_isready -U chainsignal -d chainsignal
 ```
 
 Verify PostGIS:
 
 ```powershell
-docker compose --env-file .env -f infra/docker-compose.yml exec postgres psql -U chainsignal -d chainsignal -c "SELECT PostGIS_Version();"
+docker compose exec postgres psql -U chainsignal -d chainsignal -c "SELECT PostGIS_Version();"
 ```
 
-Stop the local database:
+Stop the local stack:
 
 ```powershell
-docker compose --env-file .env -f infra/docker-compose.yml down
+docker compose down
 ```
 
 Remove the local database volume only when intentionally resetting local data:
 
 ```powershell
-docker compose --env-file .env -f infra/docker-compose.yml down -v
+docker compose down -v
 ```
 
 ## Phase 0 acceptance
 
 See [`docs/phase-0-checklist.md`](docs/phase-0-checklist.md).
 
-Do not mark runtime acceptance items as complete until the commands have actually been executed successfully.
+Runtime acceptance items are marked complete only after the commands have actually been executed successfully.

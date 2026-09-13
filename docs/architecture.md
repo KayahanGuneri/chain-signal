@@ -102,3 +102,24 @@ Because this creates deliberate database-level coupling, the Java-readable canon
 ## No silent technology expansion
 
 Do not introduce Kubernetes, cloud deployment, Spark, Airflow, MinIO, ClickHouse, dbt, MLflow, FastAPI model serving, LLM/RAG, authentication/multi-tenancy or Redis without first documenting the problem, simplest alternative, justification and operational cost.
+
+## Docker-first local runtime
+
+Docker Compose is the single integrated local-runtime entrypoint for ChainSignal.
+
+The repository root owns the developer-facing `compose.yml`. Infrastructure implementation details remain under `/infra`.
+
+The target developer workflow is:
+
+```text
+clean clone
+  -> create local .env from .env.example
+  -> docker compose up -d --build
+  -> healthy local stack
+```
+
+As application subprojects are initialized, Spring Boot, Python and Next.js services will be containerized and added to the same Compose project. The Go replay service and Kafka remain optional Phase 6 components and must not be required for the batch-first core runtime.
+
+Containers may use `restart: unless-stopped` for local resilience, but Docker Desktop / the Docker daemon must still be running.
+
+This decision exists for local reproducibility and developer ergonomics. It does not imply Kubernetes, cloud deployment or production orchestration.

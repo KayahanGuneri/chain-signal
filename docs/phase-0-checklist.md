@@ -57,19 +57,22 @@ A checkbox is complete only when the underlying artifact or runtime behavior has
 - [x] `.env.example`
 - [x] `.gitignore`
 - [x] Docker Compose PostgreSQL/PostGIS skeleton
+- [x] Root-level `compose.yml` is the single local runtime entrypoint
+- [x] Docker-first local runtime contract documented
 - [x] PostgreSQL healthcheck configured
-- [ ] `.env` copied locally from `.env.example`
-- [ ] Docker Compose starts successfully on developer machine
-- [ ] PostgreSQL reports healthy
-- [ ] `SELECT PostGIS_Version();` succeeds
-- [ ] Clean-clone bootstrap instructions verified manually
+- [x] `.env` copied locally from `.env.example`
+- [x] Docker Compose starts successfully on developer machine
+- [x] PostgreSQL reports healthy
+- [x] `SELECT PostGIS_Version();` succeeds
+- [x] Clean-clone bootstrap instructions verified manually
 
 ## Git / phase closeout
 
-- [ ] `git status` reviewed
-- [ ] Phase 0 files committed
-- [ ] GitHub remote configured
-- [ ] Branch pushed
+- [x] `git status` reviewed
+- [x] Phase 0 files committed
+- [x] GitHub remote configured
+- [x] Branch pushed
 - [ ] Phase 0 acceptance reviewed line by line
 - [ ] Learning summary produced
 - [ ] PHASE_HANDOFF produced
+
