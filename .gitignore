@@ -1,0 +1,42 @@
+﻿# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Java
+backend/.gradle/
+backend/build/
+backend/target/
+*.class
+
+# Python
+data-pipeline/.venv/
+data-pipeline/venv/
+data-pipeline/__pycache__/
+data-pipeline/.pytest_cache/
+data-pipeline/.mypy_cache/
+data-pipeline/.ruff_cache/
+*.py[cod]
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/coverage/
+
+# Go
+replay-service/bin/
+replay-service/coverage.out
+
+# Local data / logs
+*.log
+.data/
+
+# Docker / local DB artifacts
+infra/.local/

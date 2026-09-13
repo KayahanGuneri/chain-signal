@@ -1,0 +1,104 @@
+﻿# ChainSignal — Architecture
+
+## Architectural objective
+
+Use the smallest architecture that cleanly separates data engineering, business risk logic, presentation and optional replay/streaming concerns while keeping the entire core runtime local and reproducible.
+
+## Responsibilities
+
+### Python data pipeline
+
+**Why here?** Python is the project's data engineering/statistics/ML environment and owns source-specific transformation concerns.
+
+Responsibilities:
+
+- source adapters and ingestion
+- raw/Bronze preservation
+- validation and quarantine
+- canonical Event normalization
+- data quality
+- historical baselines
+- StatisticalAnomaly
+- MLAnomaly
+
+Python must not implement the deterministic operational RiskEngine or Alert lifecycle.
+
+### Java / Spring Boot
+
+**Why here?** Java/Spring Boot owns stable business rules, lifecycle logic, geospatial risk orchestration and public application APIs.
+
+Responsibilities:
+
+- SupplyAsset lifecycle
+- read-only consumption of the canonical Event persistence contract
+- geospatial event/asset matching orchestration
+- deterministic operational RiskEngine
+- RiskSnapshot and RiskReason lifecycle
+- Alert lifecycle
+- REST/API contracts
+- dashboard aggregation APIs
+- optional future Kafka consumer
+
+Java must not duplicate source normalization or anomaly-model training.
+
+### Go replay service
+
+**Why here?** Go is reserved for a later workload where concurrency, rate control and graceful stream replay are real requirements.
+
+Responsibilities only if Phase 6 gate is reached:
+
+- historical canonical event replay
+- rate-controlled Kafka producer
+- replay concurrency
+- graceful shutdown
+- replay metrics
+
+Go must not reimplement Python normalization or Java risk logic.
+
+### Frontend
+
+**Why here?** Next.js/TypeScript provides the operational decision-support UI.
+
+Responsibilities:
+
+- dashboard
+- map
+- asset detail
+- event list
+- risk reasons/history
+- anomaly signals
+- alerts
+- loading/error/empty states
+
+### PostgreSQL / PostGIS
+
+**Why here?** One local relational/geospatial store is sufficient for V1 and supports spatial queries without introducing extra infrastructure.
+
+A single database instance does not imply shared write ownership.
+
+## Batch-first architecture
+
+Phase 0-5 uses the batch-first path:
+
+```text
+Public Sources
+  -> Python ingestion/validation/raw/normalization
+  -> PostgreSQL/PostGIS canonical event data
+  -> Spring Boot read-only event consumption
+  -> geospatial matching
+  -> deterministic risk calculation
+  -> RiskSnapshot / Alert
+  -> Next.js dashboard
+```
+
+Kafka and Go are intentionally deferred. They may be introduced only when the core batch/data/risk product is stable and replay/streaming adds a real capability.
+
+## Cross-language contract
+
+Python owns canonical event persistence and migrations. Spring Boot may read the documented Java-visible portion of that schema but must never write to it.
+
+Because this creates deliberate database-level coupling, the Java-readable canonical event schema is a version-aware cross-language contract. Python-owned migrations that break that contract require explicit compatibility handling.
+
+## No silent technology expansion
+
+Do not introduce Kubernetes, cloud deployment, Spark, Airflow, MinIO, ClickHouse, dbt, MLflow, FastAPI model serving, LLM/RAG, authentication/multi-tenancy or Redis without first documenting the problem, simplest alternative, justification and operational cost.
