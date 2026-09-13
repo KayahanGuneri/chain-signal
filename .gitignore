@@ -1,42 +1,33 @@
-﻿# Environment / secrets
+# Local environment / secrets
 .env
 .env.*
 !.env.example
 
-# IDE / OS
-.idea/
-.vscode/
-.DS_Store
-Thumbs.db
-
-# Java
-backend/.gradle/
-backend/build/
+# Java / Maven
 backend/target/
 *.class
 
 # Python
-data-pipeline/.venv/
-data-pipeline/venv/
-data-pipeline/__pycache__/
-data-pipeline/.pytest_cache/
-data-pipeline/.mypy_cache/
-data-pipeline/.ruff_cache/
+__pycache__/
 *.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+data-pipeline/build/
+data-pipeline/dist/
 
 # Node / Next.js
 frontend/node_modules/
 frontend/.next/
-frontend/out/
-frontend/coverage/
+frontend/npm-debug.log*
 
 # Go
 replay-service/bin/
-replay-service/coverage.out
+replay-service/dist/
 
-# Local data / logs
-*.log
-.data/
-
-# Docker / local DB artifacts
-infra/.local/
+# Editors / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

@@ -1,15 +1,9 @@
-﻿# Replay Service
+# ChainSignal Replay Service
 
-Future Go historical replay / stream simulation service.
+Go replay-service skeleton.
 
-This component is **gated until Phase 6** and must not be implemented merely to increase technology count.
+This module is deliberately gated until Phase 6. It exists in Phase 0 only so the monorepo/toolchain boundary is reproducible and independently buildable.
 
-If the Phase 0-5 batch core is stable, its responsibilities will be:
+It must not implement Python normalization or Java RiskEngine logic.
 
-- read historical canonical events
-- rate-controlled replay
-- Kafka publishing
-- concurrency and graceful shutdown
-- replay metrics
-
-It must not reimplement Python normalization or the Java RiskEngine.
+Kafka is not part of the Phase 0 default runtime.

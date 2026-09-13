@@ -1,16 +1,19 @@
-﻿# Backend
+# ChainSignal Backend
 
-Future Spring Boot control plane / risk domain.
+Spring Boot control-plane / deterministic risk-domain skeleton.
 
-Phase 0 contains no backend business logic.
+Phase 0 contains bootstrap/runtime code only. Business capabilities such as SupplyAsset lifecycle, RiskEngine, RiskSnapshot and Alert behavior are implemented in later phases.
 
-Planned ownership:
+## Dependency management
 
-- SupplyAsset lifecycle
-- geospatial event/asset matching orchestration
-- deterministic RiskEngine
-- RiskSnapshot lifecycle
-- Alert lifecycle
-- REST API and dashboard aggregation
+- Java 21
+- Spring Boot 4.1.1
+- Maven
 
-Java must not duplicate Python source normalization or anomaly computation.
+## Local build
+
+```text
+mvn clean verify
+```
+
+The integrated project workflow is Docker-first from the repository root.

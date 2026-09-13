@@ -1,4 +1,4 @@
-﻿# ChainSignal
+# ChainSignal
 
 **Supply Chain Risk Intelligence Platform**
 
@@ -6,7 +6,7 @@ ChainSignal is a local-first decision-support platform for manufacturer/importer
 
 ## Phase 0 status
 
-This repository currently contains the **Product Definition & Architecture Contract** and a Docker-first local runtime skeleton. Business logic is intentionally deferred.
+Phase 0 establishes the Product Definition & Architecture Contract plus a buildable Docker-first monorepo skeleton. Business features are intentionally deferred.
 
 ### V1 tracked assets
 
@@ -23,59 +23,41 @@ This repository currently contains the **Product Definition & Architecture Contr
 
 ## Architecture baseline
 
-- **Python** — ingestion, raw/Bronze preservation, validation, canonical normalization, data quality/quarantine, statistical anomaly, ML anomaly.
-- **Java 21 / Spring Boot** — SupplyAsset lifecycle, geospatial matching orchestration, deterministic RiskEngine, RiskSnapshot, Alert lifecycle, REST APIs.
+- **Python** — ingestion, raw/Bronze preservation, validation, canonical normalization, data quality/quarantine, statistical anomaly and ML anomaly.
+- **Java 21 / Spring Boot** — SupplyAsset lifecycle, geospatial matching orchestration, deterministic RiskEngine, RiskSnapshot, Alert lifecycle and REST APIs.
 - **Next.js / TypeScript** — operational dashboard and visualization.
 - **PostgreSQL / PostGIS** — local persistence and geospatial querying with explicit table ownership.
-- **Go** — Phase 6 only, for historical replay / Kafka stream simulation if the batch core is stable.
-- **Kafka** — intentionally deferred until the batch-first core product is stable.
-
-## Docker-first local runtime
-
-ChainSignal uses Docker Compose as the single integrated local runtime entrypoint.
-
-As later phases initialize the application subprojects, their containers will be added to the same Compose project:
-
-```text
-docker compose up -d --build
-          |
-          +-- PostgreSQL/PostGIS
-          +-- Spring Boot backend        (later phase)
-          +-- Python data pipeline       (later phase)
-          +-- Next.js frontend           (later phase)
-          +-- Go replay service          (Phase 6 gate)
-          +-- Kafka                      (Phase 6 gate/profile)
-```
-
-For the normal integrated local workflow, developers should not need to manually start every application runtime one by one.
-
-Kafka and the Go replay service remain gated by the batch-first architecture decision.
+- **Go** — gated replay/stream simulation workload for Phase 6.
+- **Kafka** — intentionally absent until the batch-first core is stable.
 
 ## Toolchain baseline
 
-The Phase 0 baseline is:
-
 - Java: 21
+- Spring Boot: 4.1.1
+- Maven: 3.9.x
 - Python: 3.12
-- Node.js: 22 LTS
-- TypeScript: 5.x
-- Go: 1.24+
+- Node.js: 24 LTS
+- Next.js: 16.3.3
+- React: 19.3.0
+- TypeScript: 5.9.2
+- Go: 1.27.1
 - Docker Desktop / Docker Compose v2
-- PostgreSQL 16 + PostGIS 3.5 container
+- PostgreSQL: 16
+- PostGIS: 3.5
 
-Exact application dependency versions will be locked when each subproject is initialized in later phases.
+Each subproject owns its dependency manifest independently.
 
 ## Repository structure
 
 ```text
 chain-signal/
-├── compose.yml               # Single local Docker Compose entrypoint
-├── backend/                  # Spring Boot risk/control plane (later phase)
-├── data-pipeline/            # Python ingestion/data/ML pipeline (later phase)
-├── frontend/                 # Next.js dashboard (later phase)
-├── replay-service/           # Go replay service (Phase 6 gate)
-├── infra/                    # Local infrastructure details
-├── docs/                     # Product/domain/architecture docs
+├── compose.yml
+├── backend/                  # Spring Boot + Maven
+├── data-pipeline/            # Python package / batch workloads
+├── frontend/                 # Next.js + TypeScript
+├── replay-service/           # Go module; Phase 6 gate
+├── infra/                    # PostgreSQL initialization
+├── docs/
 │   ├── adr/
 │   └── diagrams/
 ├── .env.example
@@ -83,21 +65,23 @@ chain-signal/
 └── README.md
 ```
 
-## Local bootstrap
+## Docker-first bootstrap
+
+Docker Desktop / Docker Engine must be running.
 
 From the repository root:
 
 ```powershell
 Copy-Item .env.example .env
-docker compose up -d --build
+docker compose up -d --build --wait
 docker compose ps
 ```
 
-Verify PostgreSQL readiness:
+Default services:
 
-```powershell
-docker compose exec postgres pg_isready -U chainsignal -d chainsignal
-```
+- PostgreSQL/PostGIS: `localhost:5432`
+- Spring Boot health: `http://localhost:8080/actuator/health`
+- Next.js skeleton: `http://localhost:3000`
 
 Verify PostGIS:
 
@@ -105,13 +89,26 @@ Verify PostGIS:
 docker compose exec postgres psql -U chainsignal -d chainsignal -c "SELECT PostGIS_Version();"
 ```
 
-Stop the local stack:
+Run the Python batch skeleton:
+
+```powershell
+docker compose --profile batch run --rm data-pipeline
+```
+
+Build/run the gated Go skeleton without introducing Kafka:
+
+```powershell
+docker compose --profile streaming build replay-service
+docker compose --profile streaming run --rm replay-service
+```
+
+Stop the default runtime:
 
 ```powershell
 docker compose down
 ```
 
-Remove the local database volume only when intentionally resetting local data:
+Reset local database data only when intentionally required:
 
 ```powershell
 docker compose down -v
@@ -120,5 +117,3 @@ docker compose down -v
 ## Phase 0 acceptance
 
 See [`docs/phase-0-checklist.md`](docs/phase-0-checklist.md).
-
-Runtime acceptance items are marked complete only after the commands have actually been executed successfully.

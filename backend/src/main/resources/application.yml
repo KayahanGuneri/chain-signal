@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: chainsignal-backend
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${POSTGRES_DB:chainsignal}
+    username: ${POSTGRES_USER:chainsignal}
+    password: ${POSTGRES_PASSWORD:chainsignal_local_dev}
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true

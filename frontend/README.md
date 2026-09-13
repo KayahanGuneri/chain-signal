@@ -1,15 +1,17 @@
-﻿# Frontend
+# ChainSignal Frontend
 
-Future Next.js + TypeScript operational dashboard.
+Next.js operational-dashboard skeleton.
 
-Phase 0 contains no UI feature implementation.
+Phase 0 provides only a buildable/servable bootstrap page. Map, asset detail, risk history, anomaly and alert UX are later-phase capabilities.
 
-Planned views include:
+## Dependency management
 
-- global operational map
-- tracked asset list/detail
-- event list
-- explainable risk reasons/history
-- statistical anomaly signal
-- ML anomaly signal
-- alert lifecycle
+- Node.js 24 LTS
+- Next.js 16.3.3
+- React 19.3.0
+- TypeScript 5.9.2
+- npm lockfile
+
+## Integrated local runtime
+
+The frontend is started by the root Docker Compose stack and is available on port 3000 by default.

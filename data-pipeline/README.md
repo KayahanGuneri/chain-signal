@@ -1,18 +1,18 @@
-﻿# Data Pipeline
+# ChainSignal Data Pipeline
 
-Future Python data/ML pipeline.
+Python data-engineering / statistics / ML package skeleton.
 
-Phase 0 contains no ingestion implementation.
+Phase 0 intentionally contains no ingestion adapter, normalization rule, baseline calculation or anomaly model.
 
-Planned ownership:
+## Dependency management
 
-- source adapters and ingestion
-- raw/Bronze preservation
-- validation and quarantine
-- canonical Event normalization
-- data-quality checks
-- historical baselines
-- StatisticalAnomaly
-- MLAnomaly
+- Python 3.12
+- `pyproject.toml`
 
-Python owns writes to pipeline/event data and publishes a version-aware canonical event contract for read-only Java consumption.
+## Integrated local execution
+
+From the repository root:
+
+```text
+docker compose --profile batch run --rm data-pipeline
+```

@@ -1,4 +1,4 @@
-﻿# ChainSignal — Architecture
+# ChainSignal ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Architecture
 
 ## Architectural objective
 
@@ -123,3 +123,17 @@ As application subprojects are initialized, Spring Boot, Python and Next.js serv
 Containers may use `restart: unless-stopped` for local resilience, but Docker Desktop / the Docker daemon must still be running.
 
 This decision exists for local reproducibility and developer ergonomics. It does not imply Kubernetes, cloud deployment or production orchestration.
+
+## Technical project skeleton
+
+Phase 0 creates buildable technical boundaries without implementing business features:
+
+- `/backend`: Java 21 + Spring Boot + Maven bootstrap
+- `/data-pipeline`: Python 3.12 package bootstrap
+- `/frontend`: Node.js 24 LTS + Next.js/TypeScript bootstrap
+- `/replay-service`: Go 1.27 module bootstrap, still gated for Phase 6
+- root `compose.yml`: integrated Docker-first local runtime
+
+The default Compose runtime starts PostgreSQL/PostGIS, backend and frontend. Python remains an on-demand batch workload. Go remains an on-demand/gated workload. Kafka is not introduced in Phase 0.
+
+A buildable skeleton is not permission to implement responsibilities early: normalization remains Python-owned, deterministic operational risk remains Java-owned, and replay/streaming remains gated.
