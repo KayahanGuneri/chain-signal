@@ -27,7 +27,11 @@ replay-service/dist/
 
 # Editors / OS
 .idea/
-.vscode/
 *.iml
 .DS_Store
 Thumbs.db
+
+# VS Code shared workspace configuration
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
