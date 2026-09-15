@@ -8,6 +8,8 @@ version = "0.1.0"
 description = "ChainSignal data engineering and anomaly pipeline"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "httpx>=0.28",
+    "pandas>=2.2",
     "pydantic>=2",
     "pydantic-settings>=2",
 ]

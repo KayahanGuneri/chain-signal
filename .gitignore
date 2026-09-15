@@ -35,3 +35,6 @@ Thumbs.db
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+
+# Data pipeline discovery outputs
+data-pipeline/gdacs-discovery-*.txt
