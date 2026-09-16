@@ -13,6 +13,7 @@ def test_settings_use_expected_defaults() -> None:
     assert settings.log_level == "INFO"
     assert settings.http_timeout_seconds == 10.0
     assert settings.bronze_path == Path("data/bronze")
+    assert settings.normalized_path == Path("data/normalized")
 
 
 def test_http_timeout_can_be_overridden_from_environment(

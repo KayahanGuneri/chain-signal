@@ -1,11 +1,14 @@
 import argparse
 from datetime import UTC, datetime
+from pathlib import Path
 from types import TracebackType
 from typing import Any
 
+import pyarrow.parquet as pq
 import pytest
 
 from chainsignal_pipeline import __main__ as app
+from chainsignal_pipeline.bronze.writer import BronzeWriteResult
 from chainsignal_pipeline.config import Settings
 from chainsignal_pipeline.sources.base import SourceWindow
 
@@ -115,3 +118,36 @@ def test_run_gdacs_fetch_wires_settings_to_adapter(
     assert isinstance(window, SourceWindow)
     assert window.start == start
     assert window.end == end
+
+
+def test_normalize_parser_accepts_bronze_file(tmp_path: Path) -> None:
+    path = tmp_path / "part-00000.parquet"
+    args = app.build_parser().parse_args(["normalize-gdacs", "--bronze-file", str(path)])
+    assert args.command == "normalize-gdacs"
+    assert args.bronze_file == path
+
+
+def test_normalization_command_uses_configured_normalized_path(
+    tmp_path: Path,
+    bronze_output: BronzeWriteResult,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root = tmp_path / "custom"
+    monkeypatch.setenv("CHAIN_SIGNAL_NORMALIZED_PATH", str(root))
+    # Logging configuration is process-global; preserve pytest's capture handlers.
+    monkeypatch.setattr(app, "configure_logging", lambda level: None)
+    app.main(["normalize-gdacs", "--bronze-file", str(bronze_output.path)])
+    path = (
+        root
+        / "source=GDACS"
+        / "normalization_version=v1"
+        / f"batch_id={bronze_output.metadata.batch_id}"
+    )
+    assert {output.name for output in path.iterdir()} == {
+        "events.parquet",
+        "quarantine.parquet",
+        "quality.json",
+    }
+    assert pq.ParquetFile(path / "events.parquet").read().column("sourceEventId").to_pylist() == [
+        "EQ:123"
+    ]

@@ -11,8 +11,19 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    environment: Literal["local", "test", "production"] = "local"
-    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
+    environment: Literal[
+        "local",
+        "test",
+        "production",
+    ] = "local"
+
+    log_level: Literal[
+        "DEBUG",
+        "INFO",
+        "WARNING",
+        "ERROR",
+        "CRITICAL",
+    ] = "INFO"
 
     http_timeout_seconds: float = Field(
         default=10.0,
@@ -21,3 +32,5 @@ class Settings(BaseSettings):
     )
 
     bronze_path: Path = Path("data/bronze")
+
+    normalized_path: Path = Path("data/normalized")
