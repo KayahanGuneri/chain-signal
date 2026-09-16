@@ -27,7 +27,16 @@ replay-service/dist/
 
 # Editors / OS
 .idea/
-.vscode/
 *.iml
 .DS_Store
 Thumbs.db
+
+# VS Code shared workspace configuration
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Data pipeline discovery outputs
+data-pipeline/gdacs-discovery-*.txt
+# Data pipeline runtime data
+data-pipeline/data/
