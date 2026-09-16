@@ -10,6 +10,7 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "httpx>=0.28",
     "pandas>=2.2",
+    "pyarrow>=20",
     "pydantic>=2",
     "pydantic-settings>=2",
 ]
@@ -41,3 +42,11 @@ select = ["E", "F", "I", "UP"]
 python_version = "3.12"
 strict = true
 packages = ["chainsignal_pipeline"]
+
+
+[[tool.mypy.overrides]]
+module = [
+    "pyarrow",
+    "pyarrow.*",
+]
+ignore_missing_imports = true

@@ -38,3 +38,5 @@ Thumbs.db
 
 # Data pipeline discovery outputs
 data-pipeline/gdacs-discovery-*.txt
+# Data pipeline runtime data
+data-pipeline/data/
