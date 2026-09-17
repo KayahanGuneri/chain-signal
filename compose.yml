@@ -64,8 +64,15 @@ services:
     build:
       context: ./data-pipeline
     profiles: ["batch"]
+    environment:
+      CHAIN_SIGNAL_DB_HOST: postgres
+      CHAIN_SIGNAL_DB_PORT: 5432
+      CHAIN_SIGNAL_DB_NAME: ${POSTGRES_DB}
+      CHAIN_SIGNAL_DB_USER: ${POSTGRES_USER}
+      CHAIN_SIGNAL_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      CHAIN_SIGNAL_DB_CONNECT_TIMEOUT_SECONDS: 10
     depends_on:
-      postgres:
+      backend:
         condition: service_healthy
 
   replay-service:
