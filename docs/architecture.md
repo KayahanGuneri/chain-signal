@@ -95,10 +95,11 @@ Kafka and Go are intentionally deferred. They may be introduced only when the co
 
 ## Cross-language contract
 
-Python owns canonical event persistence and migrations. Spring Boot may read the documented Java-visible portion of that schema but must never write to it.
+Python owns canonical event business-data writes. Spring Boot may read the documented Java-visible canonical event persistence contract but must never mutate canonical event business data as part of normal application behavior.
 
-Because this creates deliberate database-level coupling, the Java-readable canonical event schema is a version-aware cross-language contract. Python-owned migrations that break that contract require explicit compatibility handling.
+Flyway is the single authority for operational PostgreSQL/PostGIS schema migrations. Schema migration authority is intentionally separate from business-data ownership.
 
+Because Python writes canonical Event rows while Spring Boot reads them directly, the Java-readable persistence shape is a version-aware cross-language contract. Breaking schema changes require explicit compatibility handling across both runtimes.
 ## No silent technology expansion
 
 Do not introduce Kubernetes, cloud deployment, Spark, Airflow, MinIO, ClickHouse, dbt, MLflow, FastAPI model serving, LLM/RAG, authentication/multi-tenancy or Redis without first documenting the problem, simplest alternative, justification and operational cost.
