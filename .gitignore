@@ -20,6 +20,11 @@ data-pipeline/dist/
 frontend/node_modules/
 frontend/.next/
 frontend/npm-debug.log*
+frontend/*.tsbuildinfo
+
+# Disposable Phase 2 verification output
+.smoke/
+/phase2-review.patch
 
 # Go
 replay-service/bin/

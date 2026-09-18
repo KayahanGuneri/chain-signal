@@ -26,6 +26,10 @@ services:
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
+      EVENT_DEFAULT_LIMIT: ${EVENT_DEFAULT_LIMIT:-100}
+      EVENT_MAX_LIMIT: ${EVENT_MAX_LIMIT:-500}
+      EVENT_DEFAULT_RADIUS_KM: ${EVENT_DEFAULT_RADIUS_KM:-100}
+      EVENT_MAX_RADIUS_KM: ${EVENT_MAX_RADIUS_KM:-1000}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -44,10 +48,13 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000}
     restart: unless-stopped
     environment:
       PORT: 3000
       HOSTNAME: 0.0.0.0
+      BACKEND_URL: http://backend:8080
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:

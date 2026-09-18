@@ -3,13 +3,15 @@ from datetime import UTC, datetime
 from pathlib import Path
 from types import TracebackType
 from typing import Any
+from unittest.mock import MagicMock
 
 import pyarrow.parquet as pq
 import pytest
 
 from chainsignal_pipeline import __main__ as app
 from chainsignal_pipeline.bronze.writer import BronzeWriteResult
-from chainsignal_pipeline.config import Settings
+from chainsignal_pipeline.config import DatabaseSettings, Settings
+from chainsignal_pipeline.database.event_writer import EventPersistenceResult
 from chainsignal_pipeline.sources.base import SourceWindow
 
 
@@ -136,7 +138,22 @@ def test_normalization_command_uses_configured_normalized_path(
     monkeypatch.setenv("CHAIN_SIGNAL_NORMALIZED_PATH", str(root))
     # Logging configuration is process-global; preserve pytest's capture handlers.
     monkeypatch.setattr(app, "configure_logging", lambda level: None)
+    for key, value in {
+        "HOST": "localhost",
+        "PORT": "5432",
+        "NAME": "unit_test",
+        "USER": "unit_test",
+        "PASSWORD": "unit_test",
+    }.items():
+        monkeypatch.setenv("CHAIN_SIGNAL_DB_" + key, value)
+    persistence = MagicMock()
+    persistence.write.return_value = EventPersistenceResult(1, 1)
+    factory = MagicMock(return_value=persistence)
+    monkeypatch.setattr(app, "EventPersistenceWriter", factory)
     app.main(["normalize-gdacs", "--bronze-file", str(bronze_output.path)])
+    factory.assert_called_once()
+    persistence.write.assert_called_once()
+    assert persistence.write.call_args.args[0][0].identity == ("GDACS", "EQ:123")
     path = (
         root
         / "source=GDACS"
@@ -151,3 +168,31 @@ def test_normalization_command_uses_configured_normalized_path(
     assert pq.ParquetFile(path / "events.parquet").read().column("sourceEventId").to_pylist() == [
         "EQ:123"
     ]
+
+
+def test_cli_propagates_database_failure_without_completion_log(
+    tmp_path: Path,
+    bronze_output: BronzeWriteResult,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    monkeypatch.setenv("CHAIN_SIGNAL_NORMALIZED_PATH", str(tmp_path / "normalized"))
+    monkeypatch.setattr(app, "configure_logging", lambda level: None)
+    configured = DatabaseSettings.model_validate(
+        {
+            "host": "localhost",
+            "port": 5432,
+            "name": "unit_test",
+            "user": "unit_test",
+            "password": "unit_test",
+        }
+    )
+    monkeypatch.setattr(app, "DatabaseSettings", lambda: configured)
+    persistence = MagicMock()
+    persistence.write.side_effect = RuntimeError("Database unavailable")
+    monkeypatch.setattr(app, "EventPersistenceWriter", MagicMock(return_value=persistence))
+    with caplog.at_level("INFO"), pytest.raises(RuntimeError, match="Database unavailable"):
+        app.main(["normalize-gdacs", "--bronze-file", str(bronze_output.path)])
+    assert not any(
+        getattr(record, "event", "") == "gdacs_normalization_completed" for record in caplog.records
+    )

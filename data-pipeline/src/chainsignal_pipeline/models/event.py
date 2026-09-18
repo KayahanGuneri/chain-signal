@@ -13,6 +13,9 @@ class EventType(StrEnum):
 
     EARTHQUAKE = "EARTHQUAKE"
     FLOOD = "FLOOD"
+    CONFLICT = "CONFLICT"
+    PROTEST = "PROTEST"
+    STRIKE = "STRIKE"
 
 
 class Severity(StrEnum):

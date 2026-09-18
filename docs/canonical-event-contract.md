@@ -1,4 +1,4 @@
-﻿# ChainSignal — Canonical Event Contract
+# ChainSignal — Canonical Event Contract
 
 ## Purpose
 
@@ -15,7 +15,7 @@ The canonical Event contract isolates the rest of the system from source-specifi
 | `latitude` | yes | Point latitude |
 | `longitude` | yes | Point longitude |
 | `severity` | yes | `LOW`, `MEDIUM`, `HIGH`, or `CRITICAL` |
-| `country` | yes | ISO 3166-1 alpha-2 country code |
+| `country` | no | Nullable provider-supplied text; nonblank if present, not restricted to ISO alpha-2 |
 | `metadata` | no | Selected supplementary normalized/source-specific fields |
 | `schemaVersion` | yes | Canonical schema version |
 
@@ -36,6 +36,9 @@ The source identity is the tuple:
 - missing reliable `occurredAt` -> do not invent it from a publication timestamp; quarantine the record
 - complete provider payload -> raw/Bronze storage, not canonical `metadata`
 - `metadata` -> only selected supplementary fields needed after normalization
+- `country` -> preserve provider text; no reverse geocoding or inferred country codes
+- `metadata` -> a JSON object; `schemaVersion` -> nonblank
+- coordinates -> mandatory and bounded; GeoJSON point order is `[longitude, latitude]`
 
 ## Temporal distinction
 

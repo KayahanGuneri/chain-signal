@@ -1,4 +1,4 @@
-package io.chainsignal.backend.supplyasset.web;
+package io.chainsignal.backend.shared.web;
 
 import java.time.Instant;
 

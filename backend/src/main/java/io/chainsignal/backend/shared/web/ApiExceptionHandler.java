@@ -1,4 +1,4 @@
-package io.chainsignal.backend.supplyasset.web;
+package io.chainsignal.backend.shared.web;
 
 import java.time.Instant;
 
@@ -7,16 +7,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import io.chainsignal.backend.event.application.EventNotFoundException;
 import io.chainsignal.backend.supplyasset.application.SupplyAssetNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
-public class SupplyAssetExceptionHandler {
+public class ApiExceptionHandler {
 
-    @ExceptionHandler(SupplyAssetNotFoundException.class)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidParameter(
+            MethodArgumentTypeMismatchException exception,
+            HttpServletRequest request) {
+        return errorResponse(HttpStatus.BAD_REQUEST,
+                "Invalid parameter: " + exception.getName(), request.getRequestURI());
+    }
+
+    @ExceptionHandler({SupplyAssetNotFoundException.class, EventNotFoundException.class})
     public ResponseEntity<ApiErrorResponse> handleNotFound(
-            SupplyAssetNotFoundException exception,
+            RuntimeException exception,
             HttpServletRequest request) {
         return errorResponse(
                 HttpStatus.NOT_FOUND,

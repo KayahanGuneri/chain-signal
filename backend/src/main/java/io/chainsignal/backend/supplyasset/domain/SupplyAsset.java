@@ -1,7 +1,5 @@
 package io.chainsignal.backend.supplyasset.domain;
 
-import java.util.Objects;
-
 public record SupplyAsset(
         long id,
         SupplyAssetType type,
@@ -18,7 +16,9 @@ public record SupplyAsset(
             throw new IllegalArgumentException("Supply asset id must be positive");
         }
 
-        Objects.requireNonNull(type, "Supply asset type must not be null");
+        if (type == null) {
+            throw new IllegalArgumentException("Supply asset type must not be null");
+        }
 
         requireNonBlank(name, "Supply asset name must not be blank");
         requireNonBlank(country, "Supply asset country must not be blank");

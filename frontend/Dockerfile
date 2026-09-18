@@ -7,12 +7,16 @@ RUN npm ci
 FROM node:24.21.0-alpine AS build
 WORKDIR /app
 
+ARG FRONTEND_ORIGIN=http://localhost:3000
+ENV FRONTEND_ORIGIN=$FRONTEND_ORIGIN
 ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 RUN npm run typecheck
+RUN npm run lint
+RUN npm test
 RUN npm run build
 
 FROM node:24.21.0-alpine AS runtime
