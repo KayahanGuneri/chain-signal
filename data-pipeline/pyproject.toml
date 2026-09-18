@@ -13,6 +13,7 @@ dependencies = [
     "pyarrow>=20",
     "pydantic>=2",
     "pydantic-settings>=2",
+    "psycopg[binary]>=3.2",
 ]
 
 [project.optional-dependencies]
@@ -42,6 +43,7 @@ line-length = 100
 select = ["E", "F", "I", "UP"]
 
 [tool.mypy]
+plugins = ["pydantic.mypy"]
 python_version = "3.12"
 strict = true
 packages = ["chainsignal_pipeline"]

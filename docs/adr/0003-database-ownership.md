@@ -1,7 +1,8 @@
-﻿# ADR-0003 — Shared Database with Explicit Ownership
+# ADR-0003 — Shared Database with Explicit Ownership
 
 - **Status:** Accepted
 - **Date:** 2026-09-13
+- **Amended by:** ADR-0006 for schema migration authority
 
 ## Context
 
@@ -16,6 +17,8 @@ Use one local PostgreSQL/PostGIS instance with explicit ownership:
 - Spring Boot may read the documented canonical event persistence contract directly.
 - Spring Boot must not write Python-owned canonical event data.
 - Python must not write backend-owned risk/alert lifecycle data.
+
+> **Phase 2 amendment:** ADR-0006 supersedes the migration-ownership portion of this decision. Business-data write ownership remains unchanged, while Flyway becomes the single operational schema migration authority.
 
 The Java-readable canonical event shape is a version-aware cross-language contract.
 

@@ -1,8 +1,10 @@
 # ChainSignal Backend
 
-Spring Boot control-plane / deterministic risk-domain skeleton.
+Spring Boot SupplyAsset lifecycle, read-only Event API and PostGIS orchestration.
 
-Phase 0 contains bootstrap/runtime code only. Business capabilities such as SupplyAsset lifecycle, RiskEngine, RiskSnapshot and Alert behavior are implemented in later phases.
+Phase 2 provides SupplyAsset CRUD, bounded Event reads and active-asset nearby
+lookup. RiskEngine, RiskSnapshot and Alert behavior remain future work. See
+[the API contract](../docs/phase-2-api.md).
 
 ## Dependency management
 

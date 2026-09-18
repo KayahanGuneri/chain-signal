@@ -12,7 +12,6 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - chainsignal_postgres_data:/var/lib/postgresql/data
-      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -27,6 +26,10 @@ services:
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
+      EVENT_DEFAULT_LIMIT: ${EVENT_DEFAULT_LIMIT:-100}
+      EVENT_MAX_LIMIT: ${EVENT_MAX_LIMIT:-500}
+      EVENT_DEFAULT_RADIUS_KM: ${EVENT_DEFAULT_RADIUS_KM:-100}
+      EVENT_MAX_RADIUS_KM: ${EVENT_MAX_RADIUS_KM:-1000}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -45,10 +48,13 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000}
     restart: unless-stopped
     environment:
       PORT: 3000
       HOSTNAME: 0.0.0.0
+      BACKEND_URL: http://backend:8080
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
@@ -65,8 +71,15 @@ services:
     build:
       context: ./data-pipeline
     profiles: ["batch"]
+    environment:
+      CHAIN_SIGNAL_DB_HOST: postgres
+      CHAIN_SIGNAL_DB_PORT: 5432
+      CHAIN_SIGNAL_DB_NAME: ${POSTGRES_DB}
+      CHAIN_SIGNAL_DB_USER: ${POSTGRES_USER}
+      CHAIN_SIGNAL_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      CHAIN_SIGNAL_DB_CONNECT_TIMEOUT_SECONDS: 10
     depends_on:
-      postgres:
+      backend:
         condition: service_healthy
 
   replay-service:

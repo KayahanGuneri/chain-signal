@@ -1,6 +1,9 @@
 spring:
   application:
     name: chainsignal-backend
+  jackson:
+    deserialization:
+      accept-float-as-int: false
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${POSTGRES_DB:chainsignal}
     username: ${POSTGRES_USER:chainsignal}
@@ -8,6 +11,13 @@ spring:
 
 server:
   port: 8080
+
+chainsignal:
+  events:
+    default-limit: ${EVENT_DEFAULT_LIMIT:100}
+    max-limit: ${EVENT_MAX_LIMIT:500}
+    default-radius-km: ${EVENT_DEFAULT_RADIUS_KM:100}
+    max-radius-km: ${EVENT_MAX_RADIUS_KM:1000}
 
 management:
   endpoints:

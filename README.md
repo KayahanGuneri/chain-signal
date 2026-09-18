@@ -1,12 +1,22 @@
+<p align="center">
+  <img src="frontend/public/brand/chainsignal-hero.png" alt="ChainSignal Supply Chain Risk Intelligence Platform — illustrative branding" />
+</p>
+
+*Illustrative branding. Metrics, routes and risk labels in the artwork are conceptual.*
+
 # ChainSignal
 
 **Supply Chain Risk Intelligence Platform**
 
 ChainSignal is a local-first decision-support platform for manufacturer/importer supply-chain operations and risk teams. It converts real public disruption data into explainable operational risk for tracked suppliers and ports. It is intentionally not a news aggregator.
 
-## Phase 0 status
+## Phase 2 status
 
-Phase 0 establishes the Product Definition & Architecture Contract plus a buildable Docker-first monorepo skeleton. Business features are intentionally deferred.
+The batch pipeline persists canonical events into PostgreSQL/PostGIS. Spring
+provides SupplyAsset CRUD, read-only Event APIs and nearby lookup; Next.js shows
+assets and disruptions on an interactive map. See the [Phase 2 API and smoke
+workflow](docs/phase-2-api.md), [current acceptance checklist](docs/phase-2-checklist.md)
+and [visual overview](docs/phase-2-overview.md). Risk scoring and alerts remain future work.
 
 ### V1 tracked assets
 
@@ -21,7 +31,10 @@ Phase 0 establishes the Product Definition & Architecture Contract plus a builda
 - `PROTEST`
 - `STRIKE`
 
-## Architecture baseline
+## Architecture roadmap
+
+This baseline includes later phases. Phase 2 implements ingestion/persistence,
+SupplyAsset lifecycle, Event reads, nearby queries and the map dashboard.
 
 - **Python** — ingestion, raw/Bronze preservation, validation, canonical normalization, data quality/quarantine, statistical anomaly and ML anomaly.
 - **Java 21 / Spring Boot** — SupplyAsset lifecycle, geospatial matching orchestration, deterministic RiskEngine, RiskSnapshot, Alert lifecycle and REST APIs.
@@ -81,7 +94,7 @@ Default services:
 
 - PostgreSQL/PostGIS: `localhost:5432`
 - Spring Boot health: `http://localhost:8080/actuator/health`
-- Next.js skeleton: `http://localhost:3000`
+- Next.js dashboard: `http://localhost:3000`
 
 Verify PostGIS:
 
@@ -114,6 +127,6 @@ Reset local database data only when intentionally required:
 docker compose down -v
 ```
 
-## Phase 0 acceptance
+## Historical Phase 0 acceptance
 
 See [`docs/phase-0-checklist.md`](docs/phase-0-checklist.md).

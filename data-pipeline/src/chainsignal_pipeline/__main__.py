@@ -10,7 +10,8 @@ from typing import Any
 from chainsignal_pipeline.bronze.models import BronzeRequest
 from chainsignal_pipeline.bronze.reader import BronzeReader
 from chainsignal_pipeline.bronze.writer import BronzeWriter
-from chainsignal_pipeline.config import Settings
+from chainsignal_pipeline.config import DatabaseSettings, Settings
+from chainsignal_pipeline.database.event_writer import EventPersistenceWriter
 from chainsignal_pipeline.logging_config import configure_logging
 from chainsignal_pipeline.normalization.gdacs import (
     normalize_gdacs_records,
@@ -86,7 +87,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     normalize_gdacs_parser = subparsers.add_parser(
         "normalize-gdacs",
-        help=("Normalize one verified GDACS Bronze batch"),
+        help=("Normalize one verified GDACS Bronze batch and persist canonical events"),
     )
 
     normalize_gdacs_parser.add_argument(
@@ -219,6 +220,7 @@ def run_gdacs_ingestion(
 def run_gdacs_normalization(
     *,
     settings: Settings,
+    event_writer: EventPersistenceWriter,
     bronze_file: Path,
 ) -> None:
     logger.info(
@@ -253,6 +255,9 @@ def run_gdacs_normalization(
         quarantined_records=(result.quarantined_records),
         summary=result.summary,
     )
+    persistence_result = event_writer.write(
+        result.events,
+    )
 
     logger.info(
         "Completed GDACS canonical normalization",
@@ -272,6 +277,9 @@ def run_gdacs_normalization(
             "quarantine_path": str(write_result.quarantine_path),
             "quality_path": str(write_result.quality_path),
             "output_created": (write_result.created),
+            "database_input_count": persistence_result.input_count,
+            "database_changed_count": persistence_result.changed_count,
+            "database_unchanged_count": persistence_result.unchanged_count,
         },
     )
 
@@ -303,8 +311,15 @@ def main(
         return
 
     if args.command == "normalize-gdacs":
+        database_settings = DatabaseSettings()
+
+        event_writer = EventPersistenceWriter(
+            settings=database_settings,
+        )
+
         run_gdacs_normalization(
             settings=settings,
+            event_writer=event_writer,
             bronze_file=args.bronze_file,
         )
         return
